@@ -1,0 +1,78 @@
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Accounting.js</title>
+
+</head>
+<body>
+
+<div id="main">
+
+<h1>Accounting.js</h1>
+
+<div id="Wrapper">
+
+<div id="CommandsWrapper">
+    <button id="cmd_new_record">Novo registro</button>
+</div> <!-- #CommandsWrapper -->
+
+<div id="RecordsWrapper">
+    <table id="RecordsPlaceholder">
+        <!--thead><tr>
+            <th>Title</th>
+            <th>Amount</th>
+        </tr></thead-->
+    </table>
+</div> <!-- #RecordsWrapper -->
+
+</div> <!-- #Wrapper -->
+
+
+<script type="text/template">
+    <div></div>
+</script>
+
+<div id="t_RecordEdit">
+
+    <input type="hidden" name="_id">
+        <fieldset>
+            <label>Novo registro de despeza</label>
+        <ol>
+        <li>
+        <label for="title">Título</label>
+        <input type="text" name="title">
+        </li><li>
+        <label for="amount">Valor</label>
+        <input type="text" name="amount">
+        </li><li>
+        <label for="date">Data</label>
+        <input type="text" name="date">
+        </li><li>
+
+        <label for="locality">Local</label>
+        <input type="text" name="locality">
+        </li><li>
+
+        <label for="description">Observações</label>
+        <textarea name="description"></textarea>
+        </li>
+        </ol>
+
+        <button id="record_edit_submit">Submit</button>
+        <button id="record_edit_cancel">Cancel</button>
+
+    </fieldset>
+</div>
+
+</body>
+    <script src="jquery-1.7.2.min.js" type="text/javascript"></script>
+    <script src="jquery.tmpl.min.js" type="text/javascript"></script>
+    <script src="jquery.dataTables.min.js" type="text/javascript"></script>
+    <script src="jquery-ui-1.8.21.custom.min.js" type="text/javascript"></script>
+    <script src="underscore.js" type="text/javascript" ></script>
+    <script src="backbone.js" type="text/javascript" ></script>
+    <script src="accounting-fe.js" type="text/javascript" ></script>
+
+</html>
+
