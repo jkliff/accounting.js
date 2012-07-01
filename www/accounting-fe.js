@@ -1,30 +1,16 @@
 jQuery (function ($) {
 
-
 var NewRecordDialog = function () {
     this.el = $('#t_RecordEdit').dialog ({autoOpen: false});
     this.el.css ('display: none;');
-    this.data = {
+    this.data = this._bindToFields ({
         _id: null,
         title : null,
         date: null,
         locality: null,
         description: null,
         amount: null
-    };
-
-    for (f in this.data) {
-        var el = $('#t_RecordEdit input[name = \'' + f + '\']')[0];
-        console.log ('binding ' + f);
-
-
-        $(el).change (function (field, that) {
-            return function (e) {
-                console.log('setting ', field, that);
-                that.data[field] = e.srcElement.value;
-            }
-        }(f, this));
-    }
+    }, '#t_RecordEdit', {'description': 'textarea'});
 
     $('button#record_edit_submit').click (function (that) {
         return function (e) {
@@ -36,13 +22,11 @@ var NewRecordDialog = function () {
         };
     } (this));
 
-    
     $('button#record_edit_cancel').click (function (that) {
         return function () {
             that.close();
         };
     }(this));
-
 }
 
 NewRecordDialog.prototype = {
@@ -53,25 +37,44 @@ NewRecordDialog.prototype = {
         console.log ('there', this.data);
         this.el.dialog('close');
     },
+    _elToReset : [],
     reset: function () {
-        console.log('reset');
-        this.data = {
+        /*this.data = {
             _id: null,
             title : null,
             date: null,
             locality: null,
             description: null,
             amount: null
-        };
-        console.log (this.data);
-
-        for (f in this.data) {
-            var el = $('#t_RecordEdit input[name = \'' + f + '\']')[0];
-            if (!el) {
-                continue;
-            }
-            el.value = this.data [f];
+        };*/
+        console.log (this.data, 'before', this._elToReset);
+        for (i in this._elToReset) {
+            var el = this._elToReset[i];
+            console.log (el, el.value, this.data, el.name);
+            el.value = this.data [el.name] = null;
         }
+    },
+    _bindToFields: function (data, elName, extraFields) {
+
+        for (f in data) {
+            console.log ('binding ' + f);
+            var fieldType = 'input';
+            if (extraFields.hasOwnProperty (f)) {
+                console.log ('extra');
+                fieldType = 'textarea';
+            }
+            var el = $(elName + ' ' + fieldType + '[name = \'' + f + '\']')[0];
+
+            $(el).change (function (field, that) {
+                return function (e) {
+                    console.log('setting ', field, that);
+                    that.data[field] = e.srcElement.value;
+                }
+            }(f, this));
+
+            this._elToReset.push (el);
+        }
+        return data;
     }
 };
 
@@ -104,7 +107,6 @@ var AccountabilityApp = function () {
 
     console.log ('accountability ok');
 }
-
 
 window.App = new AccountabilityApp;
 
