@@ -37,16 +37,29 @@ NewRecordDialog.prototype = {
         console.log ('there', this.data);
         this.el.dialog('close');
     },
+    /**
+     * Binding of data to form.
+     *
+     * _bindToFields binds the fields of a dictionary (this.data) to the direct children of a
+     * given element as given by name (elName, in the form of '#myElement'); all fields are
+     * of type input. Fields with other types (textarea, radio, etc) can have their types
+     * defined in the dict extraFields, where key is field name and value its type.
+     *
+     * For each key in this.data (key must be iterable; it doesn't matter if it has a value)
+     * try to locate a direct child element of the given parent. Bind its 'changed' event
+     * to the corresponding entry on data.
+     *
+     * No validation is made.
+     * All fields are presumed inputs unless defined in extraFields.
+     *
+     * The bound fields will be automatically nulled (in sync with this.data) by reset (along
+     * with anything else in _elToReset.
+     *
+     * TODO: locate per name without type (unless required per name of event?)
+     *
+     */
     _elToReset : [],
     reset: function () {
-        /*this.data = {
-            _id: null,
-            title : null,
-            date: null,
-            locality: null,
-            description: null,
-            amount: null
-        };*/
         console.log (this.data, 'before', this._elToReset);
         for (i in this._elToReset) {
             var el = this._elToReset[i];
@@ -80,7 +93,9 @@ NewRecordDialog.prototype = {
 
 var RecordList = function () {
     this._records = [];
-    this._dt = $('#RecordsPlaceholder').dataTable({'aoColumns' : [{'sTitle': 'Title'}, {'sTitle': 'Amount'}]});
+    this._dt = $('#RecordsPlaceholder').dataTable(
+        {'aoColumns' : [{'sTitle': 'Title'}, {'sTitle': 'Amount'}]}
+    );
 };
 
 RecordList.prototype = {
