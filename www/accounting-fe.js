@@ -14,11 +14,10 @@ var NewRecordDialog = function () {
 
     $('button#record_edit_submit').click (function (that) {
         return function (e) {
-            var d = that.data;
+            // copy the object
+            var d = jQuery.extend (true, {}, that.data);
             that.close();
             submit (d);
-            console.log (e, 'antes ', d);
-            //recordList.add (d);
         };
     } (this));
 
@@ -30,11 +29,15 @@ var NewRecordDialog = function () {
 }
 
 NewRecordDialog.prototype = {
-    open : function () {
+    open : function (data) {
+        console.log ('open', data);
+        if (data != undefined) {
+            console.log (data);
+            this.reset (data);
+        }
         this.el.dialog ('open');
     },
     close : function () {
-        console.log ('there', this.data);
         this.el.dialog('close');
     },
     /**
@@ -59,18 +62,20 @@ NewRecordDialog.prototype = {
      *
      */
     _elToReset : [],
-    reset: function () {
-        console.log (this.data, 'before', this._elToReset);
+    reset: function (newData) {
+        console.log ('resetting', newData);
         for (i in this._elToReset) {
             var el = this._elToReset[i];
-            console.log (el, el.value, this.data, el.name);
-            el.value = this.data [el.name] = null;
+            var v = null;
+            if (newData != null) {
+                v = newData[el.name];
+            }
+            el.value = this.data [el.name] = v;
         }
     },
     _bindToFields: function (data, elName, extraFields) {
 
         for (f in data) {
-            console.log ('binding ' + f);
             var fieldType = 'input';
             if (extraFields.hasOwnProperty (f)) {
                 console.log ('extra');
@@ -80,7 +85,6 @@ NewRecordDialog.prototype = {
 
             $(el).change (function (field, that) {
                 return function (e) {
-                    console.log('setting ', field, that);
                     that.data[field] = e.srcElement.value;
                 }
             }(f, this));
@@ -93,31 +97,80 @@ NewRecordDialog.prototype = {
 
 var RecordList = function () {
     this._records = [];
-    this._dt = $('#RecordsPlaceholder').dataTable(
-        {'aoColumns' : [{'sTitle': 'Title'}, {'sTitle': 'Amount'}]}
-    );
+    this._dt = null;
+    this.recordEditDialog;
 };
 
 RecordList.prototype = {
     add: function (d) {
+        console.log ('adding...', d, this._records);
         this._records.push (d);
-        console.log ([d.title, d.amount]);
-        console.log ($('#RecordsPlaceholder').dataTable().fnAddData ([d.title, d.amount]));
+        this._dt.fnAddData ([d.title, d.amount]);
+        console.log ('after add', this._records);
+    },
+
+    __formatRow: function (list) {
+        console.log ('running format row;');
+        return function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+            console.log ('running generator function', nRow, aData, iDisplayIndex, iDisplayIndexFull);
+            $('td:eq(1)', nRow).html('<a href="javascript:">' + $('td:eq(1)', nRow).html() + '</a>')
+                .click (
+                    function () {
+                        console.log ('handling click that was set on row callback', this, list, iDisplayIndex, list._records [iDisplayIndex]);
+                        list.recordEditDialog.open (list._records [iDisplayIndex]);
+                    }
+                );
+        }
+    },
+
+    refresh : function () {
+
+        console.log ('refresh', this._dt);
+        $.getJSON ('op/list')
+            .success(function (that) {
+                return function (data) {
+                    console.log ('returned', data);
+                    if (that._dt != null) {
+                        that._dt.fnDestroy()
+                    }
+                    that._dt = $('#RecordsPlaceholder').dataTable({
+                        'aoColumns' : [{'sTitle': 'Title'}, {'sTitle': 'Amount'}],
+                        'aaData': data,
+                        // don't sort
+                        'aaSorting': [],
+                        'fnRowCallback': that.__formatRow(that)}
+                    );
+                }
+            } (this))
+            .error (function () {
+                console.log ('error');
+            });
     }
 }
+
+/**
+ * Main application controller.
+ *
+ */
 
 var AccountabilityApp = function () {
     var recordEditDialog = new NewRecordDialog;
     var recordList = new RecordList;
+    recordList.recordEditDialog = recordEditDialog;
+    recordList.refresh();
 
     $('button#cmd_new_record').click (function () {
         recordEditDialog.reset();
         recordEditDialog.open();
     });
+
+    $('button#cmd_refresh_list').click (function () {
+        recordList.refresh();
+    });
+
     submit = function (data) {
         console.log ('will submit ', data);
         recordList.add (data);
-
     };
 
     console.log ('accountability ok');
