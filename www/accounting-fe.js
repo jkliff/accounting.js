@@ -116,7 +116,8 @@ RecordList.prototype = {
             $('td:eq(1)', nRow).html('<a href="javascript:">' + $('td:eq(1)', nRow).html() + '</a>')
                 .click (
                     function () {
-                        console.log ('handling click that was set on row callback', this, list, iDisplayIndex, list._records [iDisplayIndex]);
+                        console.log ('handling click that was set on row callback', this, list, 
+                                    iDisplayIndex, list._records [iDisplayIndex]);
                         list.recordEditDialog.open (list._records [iDisplayIndex]);
                     }
                 );
@@ -128,22 +129,30 @@ RecordList.prototype = {
         console.log ('refresh', this._dt);
         $.getJSON ('op/list')
             .success(function (that) {
+                console.log ('fa',  that);
                 return function (data) {
-                    console.log ('returned', data);
+                    console.log ('returned', data, that);
+                    that._records = data;
                     if (that._dt != null) {
                         that._dt.fnDestroy()
                     }
+                    console.log ('success');
                     that._dt = $('#RecordsPlaceholder').dataTable({
                         'aoColumns' : [{'sTitle': 'Title'}, {'sTitle': 'Amount'}],
-                        'aaData': data,
+                        'aaData': data.map (function (i) {
+                            return [i.title, i.amount];
+                        }),
                         // don't sort
                         'aaSorting': [],
                         'fnRowCallback': that.__formatRow(that)}
                     );
+                    console.log (that._records);
                 }
             } (this))
-            .error (function () {
-                console.log ('error');
+            .error (function (e) {
+                console.log ('error ' + e);
+                // FIXME: warn the ui that was a failure
+                alert ('could not fetch initial list.');
             });
     }
 }
@@ -154,8 +163,10 @@ RecordList.prototype = {
  */
 
 var AccountabilityApp = function () {
+
     var recordEditDialog = new NewRecordDialog;
     var recordList = new RecordList;
+
     recordList.recordEditDialog = recordEditDialog;
     recordList.refresh();
 
@@ -171,6 +182,11 @@ var AccountabilityApp = function () {
     submit = function (data) {
         console.log ('will submit ', data);
         recordList.add (data);
+
+        // FIXME: make REST-y with PUT on resource Record.
+        $.ajax ({
+            url     : 'op/put'
+        });
     };
 
     console.log ('accountability ok');

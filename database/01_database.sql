@@ -1,1 +1,1 @@
-create database accounting_js_dev;
+create database accounting;

@@ -1,6 +1,13 @@
 #!env node
 
-var CONN_STRING = 'tcp://john:QLCtWjNVMU3CU2q@bataille/playground';
+//var CONN_STRING = {
+//    user: 'johnxxx',
+//    password: 'QLCtWjNVMU3CU2q',
+//    host: 'bataille',
+//    port: '5432',
+//    database: 'playground'
+//};
+var CONN_STRING = 'pg://johnxx:5432@localhost:5432/foo';
 
 var http = require('http'),
     url = require ('url'),
@@ -8,21 +15,26 @@ var http = require('http'),
     fs = require('fs'),
     accounting = require('./accounting.js');
 
-var accountingService = new accounting.AccountingService (CONN_STRING);
+var accountingService = new accounting.AccountingService (CONN_STRING, function (err, client) {
+    console.log (err);
+    console.log (client);
+});
 
 app.listen(8000);
 
 var HANDLERS =  {
-            'list': accountingService.list
+    'list'  : accountingService.list,
+    'put'   : accountingService.save
 };
 
 function handleRecord (req, res) {
-    accountingService [req.url.substr(4)](function (data) {
+    var f = req.url.substr (4);
+    var fhandler = accountingService [f];
+
+    fhandler (function (data) {
         res.writeHead (200);
-        console.log ('returning...', data);
-        res.end (data);
+        res.end (JSON.stringify (data));
     });
-    //res.end(HANDLERS[req.url.substr (4)] ());
 }
 
 function handler (req, res) {
@@ -36,10 +48,9 @@ function handler (req, res) {
         req.url = '/index.html'
     }
     var f = __dirname +  '/www' + req.url;
-    console.log (f);
+    //console.log (f);
     fs.readFile(f,
         function (err, data) {
-            console.log ('foo' + err);
             if (err) {
                 res.writeHead(500);
                 return res.end('Error loading ' + req.url);
