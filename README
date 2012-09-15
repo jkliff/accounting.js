@@ -1,0 +1,7 @@
+Simple remote expenses tracking system.
+
+TODO: 
+- security (authentication and encryption)
+- multi user support
+- expenses account support
+- verify access through cellphone browsers
