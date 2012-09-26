@@ -1,7 +1,24 @@
 Simple remote expenses tracking system.
 
+INSTALL:
+
+First, some depencencies: 
+- git@github.com:jkliff/pgcrud.git as well and set it to your path
+- postgres database 9.0 or greater with superuser access (to run bootstrao script; regular access goes through a specific user)
+- forever (this is actually no hard dependency, but for convenience to startup and mantain the process running it's a charm); if this is not desired, on may very well use startup_once.sh to run the server. (npm install forever)
+- psycopg2 (for python) (for ubuntu, apt-get install libpq-dev, easy_install psycopg2)
+- setup ~/.pgcrud/profiles with your database's config
+
+Setup:
+- clone this repo
+- ./bootstrap.sh DB_HOSTNAME SUPERUSER
+- 
+
+
 TODO: 
 - security (authentication and encryption)
 - multi user support
 - expenses account support
 - verify access through cellphone browsers
+- error handling and warn user
+- externalize database configuration
