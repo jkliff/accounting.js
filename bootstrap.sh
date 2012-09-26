@@ -1,9 +1,12 @@
 #!/bin/bash
 
-ROLE=$1
+HOSTNAME=$1
+PORT=$2
+ROLE=$3
 
-PSQL="psql -h localhost -p 5432 -U $ROLE "
-DB=accounting_js_dev
+PSQL="psql -h $HOSTNAME -p $PORT "
+DB=accounting
 
 $PSQL postgres  -f database/01_database.sql
-$PSQL $DB       -f database/02_schema.sql
+echo "grant all privileges on database $DB to $ROLE" | $PSQL postgres
+$PSQL $DB -U $ROLE -f database/02_schema.sql
