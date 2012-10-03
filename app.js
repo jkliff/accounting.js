@@ -9,6 +9,10 @@
 //};
 var CONN_STRING = 'pg://johnxx:5432@localhost:5432/foo';
 
+String.prototype.endsWith = function(suffix) {
+    return this.indexOf(suffix, this.length - suffix.length) !== -1;
+};
+
 var http = require('http'),
     url = require ('url'),
     app = http.createServer(handler),
@@ -19,8 +23,10 @@ var accountingService = new accounting.AccountingService (CONN_STRING, function 
     console.log (err);
     console.log (client);
 });
-
-app.listen(8000);
+console.log (process.argv);
+var port = process.argv[2] == null ? 15233 : process.argv [2];
+//console.log ('port', port);
+app.listen(port);
 
 var HANDLERS =  {
     'list'  : accountingService.list,
@@ -55,7 +61,9 @@ function handler (req, res) {
                 res.writeHead(500);
                 return res.end('Error loading ' + req.url);
             }
-
+            if (req.url.endsWith ('html')) {
+                res.setHeader("Content-Type", "text/html");
+            }
             res.writeHead(200);
             res.end(data);
         }

@@ -8,7 +8,7 @@ DAO.prototype = {
     //profile : 'accounting.js-prod',
     //entity : 'record',
     _ : function (method, cb) {
-        exec ('pgcrud.py accounting.js-dev list accounting.expense' , function (error, stdout, stderr) {
+        exec ('pgcrud.py accounting.js list accounting.expense' , function (error, stdout, stderr) {
             console.log (error, stdout, stderr);
             var v = eval (stdout);
             var o = new Array;

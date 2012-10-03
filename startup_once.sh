@@ -1,1 +1,2 @@
-nohup node app.js > accounting.log & 
+PATH=$PATH:/home/john/Desktop/src/pgcrud/src/
+nohup node app.js 15233 > accounting.log & 
