@@ -20,8 +20,10 @@ var http = require('http'),
     accounting = require('./accounting.js');
 
 var accountingService = new accounting.AccountingService (CONN_STRING, function (err, client) {
+    console.log ('Constructing accounting service');
     console.log (err);
     console.log (client);
+    console.log ('-------------');
 });
 console.log (process.argv);
 var port = process.argv[2] == null ? 15233 : process.argv [2];
@@ -33,9 +35,16 @@ var HANDLERS =  {
     'put'   : accountingService.save
 };
 
-function handleRecord (req, res) {
+function handleRequest (req, res) {
+    console.log ('upon handling request,', HANDLERS);
     var f = req.url.substr (4);
     var fhandler = accountingService [f];
+
+    if (!fhandler) {
+        res.writeHead (500);
+        res.end ('no such method ' + f);
+        return;
+    }
 
     fhandler (function (data) {
         res.writeHead (200);
@@ -46,7 +55,7 @@ function handleRecord (req, res) {
 function handler (req, res) {
     console.log (req.url);
     if (req.url.indexOf ('/op') == 0) {
-        handleRecord (req, res);
+        handleRequest (req, res);
         return;
     }
 
