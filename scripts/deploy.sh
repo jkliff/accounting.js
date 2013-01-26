@@ -27,7 +27,6 @@ e=\$(netstat -lnp | grep 15233) && [[ \${#e} -gt 0 ]] && e=\${e##*LISTEN} && ech
 EOF
 
 FILES="src www"
-[[ $DB == true ]] && FILES="$FILES database"
 
 scp -r $FILES $1:"~/apps/accounting.js"
 scp scripts/start_accounting.sh $1:"~/scripts"
@@ -35,7 +34,14 @@ scp scripts/start_accounting.sh $1:"~/scripts"
 if [[ $DB == true ]] ; then
 
     ssh $1 << EOF
-find ~/apps/accounting.js/database/ -name *sql | sort -u | xargs cat | PGPASSWORD=postgres psql -h localhost -U postgres
+rm -rf ~/apps/accounting.js/database
+EOF
+
+    scp -r database $1:~/apps/accounting.js/
+
+    ssh $1 << EOF
+echo "drop database if exists accounting ; create database accounting;" | PGPASSWORD=postgres psql -h localhost -U postgres
+find ~/apps/accounting.js/database/ -name *sql | sort -u | xargs cat | PGPASSWORD=postgres psql -h localhost -U postgres accounting
 
 EOF
 

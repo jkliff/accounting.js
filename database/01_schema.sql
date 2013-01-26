@@ -10,7 +10,7 @@ SET search_path = accounting, public;
 
 SET default_with_oids = false;
 
-CREATE TABLE expense (
+CREATE TABLE accounting.expense (
     e_id                serial PRIMARY KEY,
     e_title             text,
     e_description       text,
