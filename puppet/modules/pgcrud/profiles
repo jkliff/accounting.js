@@ -1,0 +1,2 @@
+profiles:
+    accounting.js: host=localhost user=postgres dbname=accounting password=postgres

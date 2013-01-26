@@ -83,16 +83,18 @@ class accounting_js {
     ensure => present,
   }
 
+  package { "python-psycopg2":
+    ensure => present,
+  }
+
+  package { "python-yaml":
+    ensure => present,
+  }
+
   service { "postgresql":
     ensure => running,
     require => Package["postgresql-9.1"],
   }
-
-  service { "nodejs":
-    ensure => running,
-    require => Package["nodejs"],
-  }
-
 
   add_user { app_deployer:
     uid => 5666,
@@ -104,6 +106,9 @@ class accounting_js {
     type    => "ssh-rsa"
   }
 
+  package { "git":
+    ensure => present,
+  }
 }
 
 # applicable to the development vm (see case statement at the end)
@@ -128,8 +133,22 @@ class accounting_js_dev inherits accounting_js {
     require => Package["postgresql-9.1"],
   }
 
+  file { "/home/app_deployer/.pgcrud":
+    ensure => directory,
+  }
+
+  file { "/home/app_deployer/.pgcrud/profiles":
+    ensure => present,
+    source => '/tmp/vagrant-puppet/modules-0/pgcrud/profiles',
+    owner => app_deployer,
+    group => app_deployer,
+    mode => 0640,
+    require => File ["/home/app_deployer/.pgcrud"],
+  }
+
+
   exec { "default_pg_password":
-    command => "/bin/su postgres -c \"echo alter role postgres with password \'postgres\' | psql -U postgres\"",
+    command => "/usr/bin/sudo /bin/su postgres -c \"echo alter role postgres with password \\'postgres\\' | psql -U postgres\"",
     require => Service["postgresql"],
   }
 }
