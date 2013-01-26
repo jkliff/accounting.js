@@ -1,5 +1,9 @@
 Simple remote expenses tracking system.
 
+Rationale:
+Don't expect any decent javascript coding. This is first and foremost for my own didatic purposes, is and will for the forseeable future be developed on a very sporadic fashion, mostly reflecting my mood ;-)
+
+
 INSTALL:
 
 First, some depencencies: 
