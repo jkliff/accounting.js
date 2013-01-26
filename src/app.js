@@ -53,7 +53,7 @@ function handler (req, res) {
     if (req.url == '/') {
         req.url = '/index.html'
     }
-    var f = __dirname +  '/www' + req.url;
+    var f = __dirname +  '/../www' + req.url;
     //console.log (f);
     fs.readFile(f,
         function (err, data) {
