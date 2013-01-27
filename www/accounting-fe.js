@@ -185,7 +185,9 @@ var AccountabilityApp = function () {
 
         // FIXME: make REST-y with PUT on resource Record.
         $.ajax ({
-            url     : 'op/put'
+            url : 'op/put',
+            type: 'post',
+            data: JSON.stringify (data)
         });
     };
 

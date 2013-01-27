@@ -16,9 +16,14 @@ ssh $1 <<EOF
 [[ ! -d ~/apps/accounting.js ]] && mkdir -p ~/apps/accounting.js
 [[ ! -d ~/scripts ]] && mkdir -p ~/scripts
 [[ ! -d ~/bin ]] && mkdir -p ~/bin
-[[ ! -d ~/apps/pgcrud ]] && \
-    cd ~/apps/ && \
+if [[ ! -d ~/apps/pgcrud ]] ; then
+    cd ~/apps/
     git clone git://github.com/jkliff/pgcrud.git
+else
+    cd ~/apps/pgcrud
+    git pull
+fi
+
 [[ ! -e ~/bin/pgcrud.py ]] && \
     echo 'Creating link to pgcrud' && \
     cd ~/bin && \

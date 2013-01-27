@@ -16,6 +16,7 @@ CREATE TABLE accounting.expense (
     e_description       text,
     e_locality          text,
     e_value             text not null,
+    e_date              timestamp not null,
     e_created           timestamp not null default now(),
     e_last_modified     timestamp
 );

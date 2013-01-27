@@ -14,7 +14,7 @@ String.prototype.endsWith = function(suffix) {
 };
 
 var http = require('http'),
-    url = require ('url'),
+    qs = require ('querystring'),
     app = http.createServer(handler),
     fs = require('fs'),
     accounting = require('./accounting.js');
@@ -25,31 +25,63 @@ var accountingService = new accounting.AccountingService (CONN_STRING, function 
     console.log (client);
     console.log ('-------------');
 });
+
 console.log (process.argv);
+
 var port = process.argv[2] == null ? 15233 : process.argv [2];
-//console.log ('port', port);
 app.listen(port);
 
 var HANDLERS =  {
-    'list'  : accountingService.list,
-    'put'   : accountingService.save
+    'list'  : {
+        fcn: function (cb, req) {
+            accountingService.list (cb)
+        }
+    },
+    'put'   : {
+        fcn: function (cb, req) {
+            //accountingService.save (cb, convert (req));
+        //paramConverter : function (req) {
+
+
+            
+
+            var data = '';
+            var data2;
+            req.on ('data', function (d) {
+                console.log ('getting data', d);
+                data += d;
+            });
+
+            req.on ('end', function () {
+                data2 = JSON.parse (data);
+                console.log ('will send', data2);
+                accountingService.save (cb, data2);
+            });
+
+        }
+    }
 };
 
 function handleRequest (req, res) {
     console.log ('upon handling request,', HANDLERS);
     var f = req.url.substr (4);
-    var fhandler = accountingService [f];
+    var fhandler = HANDLERS [f];
 
     if (!fhandler) {
         res.writeHead (500);
         res.end ('no such method ' + f);
+        console.log ('Cannot handle request for', f, req.url);
         return;
     }
 
-    fhandler (function (data) {
-        res.writeHead (200);
-        res.end (JSON.stringify (data));
-    });
+    fhandler.fcn (
+        function (data) {
+            res.writeHead (200);
+            res.end (JSON.stringify (data));
+        },
+        //        fhandler.paramConverter === undefined ? null : fhandler.paramConverter (req)
+        req
+    );
 }
 
 function handler (req, res) {
